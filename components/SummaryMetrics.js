@@ -38,12 +38,9 @@ export default function SummaryMetrics({ summary, currency }) {
   return (
     <section aria-label="Summary metrics">
       <dl className="mt-6 grid overflow-hidden rounded-lg border border-line bg-panel sm:grid-cols-2 lg:grid-cols-[1.25fr_1fr_1fr_1fr]">
-        <div className="rise relative overflow-hidden bg-moss px-5 py-6 text-moss-ink">
-          <span aria-hidden="true" className="absolute -right-3 -bottom-10 font-display text-[9rem] leading-none font-bold opacity-10">
-            植
-          </span>
-          <dt className="relative text-sm opacity-85">Spend</dt>
-          <dd className="relative mt-3 font-display text-4xl font-bold tracking-tight xl:text-5xl xl:leading-none">{formatMoney(summary.spend, currency)}</dd>
+        <div className="rise bg-moss px-5 py-6 text-moss-ink">
+          <dt className="text-sm opacity-85">Spend</dt>
+          <dd className="mt-3 font-display text-4xl font-bold tracking-tight xl:text-5xl xl:leading-none">{formatMoney(summary.spend, currency)}</dd>
         </div>
         <Headline label="Unique Reach" value={formatNumber(summary.reach)} delay={60} />
         <Headline label="Impressions" value={formatNumber(summary.impressions)} delay={120} />

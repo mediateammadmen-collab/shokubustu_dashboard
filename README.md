@@ -67,7 +67,3 @@ The dashboard has no login, so anyone with the link can see the data, including 
 ## JSON routes
 
 `GET /api/insights` and `GET /api/creatives` accept the same `range`, `start` and `end` parameters as the dashboard.
-
-## Adding a logo
-
-The header currently shows a text mark. To use a logo, add `public/logo.png` and replace the mark in `components/Header.js`.
