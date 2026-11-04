@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import AgeCharts from "@/components/AgeCharts";
 import ApiNotice from "@/components/ApiNotice";
 import CreativesSection from "@/components/CreativesSection";
-import DailyCharts from "@/components/DailyCharts";
 import FilterBar from "@/components/FilterBar";
 import { FilterShell, FilterContent } from "@/components/FilterShell";
 import LocationReport from "@/components/LocationReport";
@@ -51,7 +50,6 @@ export default async function Page({ searchParams }) {
               </p>
             ) : null}
             <SummaryMetrics summary={insights.summary} currency={insights.currency} />
-            <DailyCharts data={insights.daily} currency={insights.currency} />
             <AgeCharts data={insights.ageBreakdown ?? []} currency={insights.currency} />
             <LocationReport data={insights.locations ?? []} summary={insights.summary} currency={insights.currency} />
             <PlacementReport data={insights.placements ?? []} summary={insights.summary} currency={insights.currency} />

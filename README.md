@@ -54,7 +54,6 @@ The dashboard has no login, so anyone with the link can see the data, including 
 
 - **Bangladesh only:** the dashboard includes campaigns whose name contains `bangladesh`, in any letter case. The delivery country is only displayed.
 - **Reach** always comes from Meta at the account or filtered level, and is never added up across campaigns.
-- **Daily reach** counts the people reached on each day. The same person can count on several days, so the daily figures add up to more than Unique Reach.
 - **Age shares** are each age group's part of the total for that metric. Meta reports reach separately for each age, so age reach can differ slightly from Unique Reach.
 - **Location** comes from Meta's region breakdown and shows where ads were delivered, including outside Bangladesh. Meta reports reach separately for each region, so the total row uses Unique Reach instead of adding them up.
 - **Placement** comes from Meta's platform and position breakdown. Its total row also uses Unique Reach.
