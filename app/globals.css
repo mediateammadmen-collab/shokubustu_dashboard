@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f3efe4;
+  --panel: #fbf8f0;
+  --ink: #1e2a22;
+  --muted: #5a665b;
+  --line: #d8d2c1;
+  --moss: #17693f;
+  --moss-ink: #f6f3e8;
+  --moss-soft: #dce5d6;
+  --seal: #b93f28;
+  --shade: rgb(30 42 34 / 0.06);
+  --age-1: #2a78d6;
+  --age-2: #eb6834;
+  --age-3: #1baf7a;
+  --age-4: #eda100;
+  --age-5: #e87ba4;
+  --age-6: #008300;
+  --age-7: #6250d6;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #121815;
+    --panel: #1a221d;
+    --ink: #eeebdf;
+    --muted: #a3ad9f;
+    --line: #2e3a32;
+    --moss: #6fd09a;
+    --moss-ink: #10201a;
+    --moss-soft: #24352b;
+    --seal: #eb7a5e;
+    --shade: rgb(238 235 223 / 0.06);
+    --age-1: #3987e5;
+    --age-2: #d95926;
+    --age-3: #199e70;
+    --age-4: #c98500;
+    --age-5: #d55181;
+    --age-6: #008300;
+    --age-7: #9085e9;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-panel: var(--panel);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-moss: var(--moss);
+  --color-moss-ink: var(--moss-ink);
+  --color-moss-soft: var(--moss-soft);
+  --color-seal: var(--seal);
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-mincho), ui-serif, Georgia, serif;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes slide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(350%); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.rise { animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.progress-bar { animation: slide 1.1s ease-in-out infinite; }
+.breathe { animation: breathe 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .progress-bar, .breathe { animation: none; }
+}
+
+:focus-visible { outline: 2px solid var(--moss); outline-offset: 2px; }
+
+.rdp-root.rdp-root {
+  --rdp-accent-color: var(--moss);
+  --rdp-accent-background-color: var(--moss-soft);
+  --rdp-day-height: 36px;
+  --rdp-day-width: 36px;
+  --rdp-day_button-height: 34px;
+  --rdp-day_button-width: 34px;
+  font-size: 0.875rem;
+}
