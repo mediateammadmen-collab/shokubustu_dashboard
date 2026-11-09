@@ -58,6 +58,7 @@ The dashboard has no login, so anyone with the link can see the data, including 
 - **Location** comes from Meta's region breakdown and shows where ads were delivered, including outside Bangladesh. Meta reports reach separately for each region, so the total row uses Unique Reach instead of adding them up.
 - **Placement** comes from Meta's platform and position breakdown. Its total row also uses Unique Reach.
 - **Platform and device** come from Meta's platform and device breakdowns. **Operating system** is worked out from the device, because Meta doesn't report it. Desktop can't be split further, and the table leaves reach empty because it can't be added across devices.
+- **Video playback:** Meta only returns a video's playable file to the Facebook Page that owns it, so the server fetches that Page's token with your token and uses it in memory only. The token's user needs a role on the Page. Without one, the card shows the poster and a View on Facebook link.
 - **Video metrics** appear only on video ads. Video plays and 3s views are different Meta metrics, and cost per ThruPlay is spend divided by ThruPlays.
 - **Results and cost per result** use Meta's own fields. For reach, cost per result is spend ÷ reach × 1,000.
 - **Rates** are calculated from summed raw counts, never averaged.

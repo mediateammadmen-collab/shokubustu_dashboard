@@ -98,3 +98,11 @@ body {
   --rdp-day_button-width: 34px;
   font-size: 0.875rem;
 }
+
+/* In fullscreen, show the whole video instead of filling the screen and cropping it. */
+video:fullscreen {
+  object-fit: contain !important;
+}
+video:-webkit-full-screen {
+  object-fit: contain !important;
+}

@@ -4,7 +4,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Tabs from "@radix-ui/react-tabs";
-import { Clapperboard, ImageOff, X } from "lucide-react";
+import { ExternalLink, ImageOff, Play, X } from "lucide-react";
 import { useState } from "react";
 import { formatCostPerResult, formatDay, formatDuration, formatMoney, formatNumber, formatPercent, formatRatio } from "@/lib/format";
 
@@ -40,21 +40,119 @@ function AdImage({ src, alt, className }) {
   return <img src={src} alt={alt} loading="lazy" onError={() => setFailedSrc(src)} className={`bg-moss-soft object-contain ${className}`} />;
 }
 
-function AdMedia({ ad, className, large = false }) {
-  if (ad.isVideo && ad.videoSource) {
+/** Shown when a video has no playable file: the poster, a play mark and a link to the video on Facebook. */
+function VideoFallback({ ad, className }) {
+  return (
+    <div className={`relative ${className}`}>
+      <AdImage src={ad.poster ?? ad.image} alt={ad.title} className="h-full w-full" />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-0 grid place-items-center">
+        <span className="grid size-14 place-items-center rounded-full bg-black/55 text-white">
+          <Play className="size-6 translate-x-0.5 fill-current" />
+        </span>
+      </span>
+      {ad.videoPermalink ? (
+        <a
+          href={ad.videoPermalink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-2 left-2 z-20 inline-flex items-center gap-1.5 rounded bg-panel px-2 py-1 text-xs font-medium text-ink ring-1 ring-line hover:ring-moss"
+        >
+          View on Facebook
+          <ExternalLink className="size-3" aria-hidden="true" />
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+function AdMedia({ ad, className }) {
+  // The source URL is signed and expires. If it no longer loads, show the fallback instead of a broken player.
+  const [failedSource, setFailedSource] = useState(null);
+  if (ad.isVideo && ad.videoSource && failedSource !== ad.videoSource) {
     return (
       <video
         controls
         playsInline
-        preload={large ? "metadata" : "none"}
+        preload="none"
         poster={ad.poster ?? undefined}
         src={ad.videoSource}
         aria-label={`Video: ${ad.title}`}
+        onClick={(event) => event.stopPropagation()}
+        onError={() => setFailedSource(ad.videoSource)}
         className={`relative z-10 bg-black object-contain ${className}`}
       />
     );
   }
+  if (ad.isVideo) return <VideoFallback ad={ad} className={className} />;
   return <AdImage src={ad.poster ?? ad.image} alt={ad.title} className={className} />;
+}
+
+// Fills the whole left side edge to edge: full width on phones, full height on wider screens with the
+// width following the media's shape. object-cover only trims an edge if the media hits the size limit.
+const STAGE_MEDIA = "block h-auto w-full max-h-[70dvh] object-cover md:h-full md:max-h-none md:w-auto md:max-w-[60vw]";
+
+/** The pop-up's media at its natural shape: a playable video, a video's poster with a Facebook link, or the image. */
+function StageMedia({ ad }) {
+  // Most ads are 4:5. The video's real shape replaces this once its size is known.
+  const [ratio, setRatio] = useState(4 / 5);
+  const [failedSource, setFailedSource] = useState(null);
+  const [failedImage, setFailedImage] = useState(null);
+  const src = ad.poster ?? ad.image;
+
+  if (ad.isVideo && ad.videoSource && failedSource !== ad.videoSource) {
+    return (
+      <video
+        controls
+        playsInline
+        preload="metadata"
+        poster={src ?? undefined}
+        src={ad.videoSource}
+        aria-label={`Video: ${ad.title}`}
+        onLoadedMetadata={(event) => {
+          const { videoWidth, videoHeight } = event.currentTarget;
+          if (videoWidth && videoHeight) setRatio(videoWidth / videoHeight);
+        }}
+        onError={() => setFailedSource(ad.videoSource)}
+        style={{ aspectRatio: ratio }}
+        className={`${STAGE_MEDIA} bg-black`}
+      />
+    );
+  }
+
+  if (!src || failedImage === src) {
+    return (
+      <div className="grid aspect-[4/5] w-full place-items-center bg-white/5 text-white/60 md:h-full md:w-auto">
+        <ImageOff className="size-8" aria-hidden="true" />
+        <span className="sr-only">Image unavailable</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative md:h-full">
+      <img src={src} alt={ad.title} onError={() => setFailedImage(src)} className={STAGE_MEDIA} />
+      {ad.isVideo ? (
+        <>
+          <span aria-hidden="true" className="pointer-events-none absolute inset-0 grid place-items-center">
+            <span className="grid size-16 place-items-center rounded-full bg-black/55 text-white">
+              <Play className="size-7 translate-x-0.5 fill-current" />
+            </span>
+          </span>
+          {ad.videoPermalink ? (
+            <a
+              href={ad.videoPermalink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-black shadow-md hover:bg-white/90"
+            >
+              View on Facebook
+              <ExternalLink className="size-3.5" aria-hidden="true" />
+            </a>
+          ) : null}
+        </>
+      ) : null}
+    </div>
+  );
 }
 
 function cardMetrics(ad, currency) {
@@ -115,12 +213,6 @@ function AdCard({ ad, currency, onOpen }) {
         <div className="pointer-events-none absolute top-2 left-2 z-20 flex flex-wrap gap-1.5">
           <StatusBadge status={ad.status} />
           <FormatBadge label={ad.format} />
-          {ad.isVideo && !ad.videoSource ? (
-            <span className="inline-flex items-center gap-1 rounded bg-panel px-2 py-0.5 text-xs text-ink ring-1 ring-line">
-              <Clapperboard className="size-3" aria-hidden="true" />
-              Poster only
-            </span>
-          ) : null}
         </div>
       </div>
       <div className="flex grow flex-col p-4">
@@ -171,17 +263,17 @@ function AdDialog({ ad, currency, onClose }) {
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60" />
         <Dialog.Content
           aria-describedby={undefined}
-          className="fixed top-1/2 left-1/2 z-50 max-h-[90dvh] w-[calc(100vw-2rem)] max-w-4xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg bg-panel shadow-2xl"
+          className="fixed top-1/2 left-1/2 z-50 max-h-[92dvh] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl bg-panel shadow-2xl md:h-[min(88dvh,780px)] md:w-auto md:max-w-[calc(100vw-4rem)] md:overflow-hidden"
         >
           {ad ? (
-            <div className="grid md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-              <div className="bg-moss-soft">
-                <AdMedia ad={ad} large className="aspect-[3/4] w-full" />
-                {ad.isVideo && !ad.videoSource ? (
-                  <p className="p-3 text-xs text-muted">Meta didn&apos;t return a playable file for this video, so its poster is shown.</p>
-                ) : null}
+            <div className="md:flex md:h-full">
+              <div className="shrink-0 bg-black md:h-full">
+                <StageMedia ad={ad} />
               </div>
-              <div className="p-6">
+              <div className="p-6 md:h-full md:w-[26rem] md:overflow-y-auto lg:w-[30rem]">
+                {ad.isVideo && !ad.videoSource ? (
+                  <p className="mb-3 pr-10 text-xs text-muted">Meta didn&apos;t return a playable file for this video.</p>
+                ) : null}
                 <div className="flex flex-wrap gap-1.5 pr-10">
                   <StatusBadge status={ad.status} />
                   <FormatBadge label={ad.format} />
@@ -206,7 +298,7 @@ function AdDialog({ ad, currency, onClose }) {
               </div>
             </div>
           ) : null}
-          <Dialog.Close aria-label="Close" className="absolute top-3 right-3 z-20 grid size-9 place-items-center rounded-md bg-panel text-ink ring-1 ring-line hover:ring-moss">
+          <Dialog.Close aria-label="Close" className="absolute top-3 right-3 z-20 grid size-9 place-items-center rounded-full bg-panel text-ink ring-1 ring-line hover:ring-moss">
             <X className="size-4" aria-hidden="true" />
           </Dialog.Close>
         </Dialog.Content>
